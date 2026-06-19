@@ -86,9 +86,9 @@ st.markdown("""
     }
 
     .block-container {
-        padding-top: 2rem;
+        padding-top: 1.5rem;
         padding-bottom: 2rem;
-        max-width: 1320px;
+        max-width: 1380px;
     }
 
     .hero {
@@ -115,51 +115,51 @@ st.markdown("""
 
     .section-header {
         background: #ffffff;
-        padding: 1.2rem 1.5rem;
+        padding: 1rem 1.3rem;
         border-radius: 18px;
         border: 1px solid #e5e7eb;
         box-shadow: 0 6px 16px rgba(0,0,0,0.04);
-        margin-bottom: 1.1rem;
+        margin-bottom: 1rem;
     }
 
     .section-header h1 {
         margin: 0;
         color: #1f2937;
-        font-size: 2.1rem;
+        font-size: 2rem;
     }
 
     .section-header p {
-        margin-top: 0.35rem;
+        margin-top: 0.25rem;
         color: #6b7280;
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .metric-card {
         background: white;
-        padding: 1rem;
-        border-radius: 18px;
+        padding: 0.85rem;
+        border-radius: 16px;
         border: 1px solid #e5e7eb;
         text-align: center;
         box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-        min-height: 105px;
+        min-height: 90px;
     }
 
     .metric-card h2 {
         color: #111827;
-        margin-bottom: 0.1rem;
-        font-size: 1.9rem;
+        margin: 0;
+        font-size: 1.6rem;
     }
 
     .metric-card p {
         color: #4b5563;
-        margin: 0;
-        font-size: 0.92rem;
+        margin: 0.15rem 0 0 0;
+        font-size: 0.86rem;
         font-weight: 600;
     }
 
     .metric-card span {
         color: #9ca3af;
-        font-size: 0.8rem;
+        font-size: 0.74rem;
     }
 
     .module-card {
@@ -173,11 +173,21 @@ st.markdown("""
 
     .ai-box {
         background: #ffffff;
-        padding: 1.2rem;
+        padding: 1rem;
         border-radius: 18px;
         border: 1px solid #e5e7eb;
         box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-        margin-top: 1rem;
+        min-height: 340px;
+    }
+
+    .ai-box h4 {
+        margin-top: 0;
+        color: #111827;
+    }
+
+    .ai-box p {
+        color: #4b5563;
+        font-size: 0.92rem;
     }
 
     .status-active {
@@ -279,7 +289,7 @@ elif menu == "📊 Encuesta de Calidad":
     st.markdown("""
     <div class="section-header">
         <h1>📊 Encuesta de Calidad</h1>
-        <p>Resultados cuantitativos y comentarios abiertos de la encuesta institucional.</p>
+        <p>Resultados cuantitativos, comparativo por carrera y comentarios abiertos.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -427,58 +437,116 @@ elif menu == "📊 Encuesta de Calidad":
             | Menor a 70 | 🔴 Foco rojo |
             """)
 
-        tab_resumen, tab_secciones, tab_focos, tab_comentarios = st.tabs([
+        tab_resumen, tab_comparativo, tab_secciones, tab_focos, tab_comentarios = st.tabs([
             "📌 Resumen",
+            "🏆 Comparativo por carrera",
             "📊 Secciones",
             "⚠️ Focos rojos",
             "🗣️ Comentarios"
         ])
 
         with tab_resumen:
-            st.markdown("### Vista general")
+            col_grafica, col_ia = st.columns([1.45, 0.85])
 
-            if not df_resumen.empty and "SECCION" in df_resumen.columns:
-                df_seccion_resumen = (
-                    df_resumen
-                    .groupby("SECCION", as_index=False)
-                    .agg(PROMEDIO=("PROMEDIO", "mean"))
-                    .sort_values("PROMEDIO", ascending=True)
+            with col_grafica:
+                st.markdown("### Promedio por sección")
+
+                if not df_resumen.empty and "SECCION" in df_resumen.columns:
+                    df_seccion_resumen = (
+                        df_resumen
+                        .groupby("SECCION", as_index=False)
+                        .agg(PROMEDIO=("PROMEDIO", "mean"))
+                        .sort_values("PROMEDIO", ascending=True)
+                    )
+
+                    fig_resumen = px.bar(
+                        df_seccion_resumen,
+                        x="PROMEDIO",
+                        y="SECCION",
+                        orientation="h",
+                        text="PROMEDIO",
+                        title=None
+                    )
+
+                    fig_resumen.update_traces(texttemplate="%{text:.1f}", textposition="outside")
+                    fig_resumen.update_layout(
+                        xaxis_range=[0, 100],
+                        xaxis_title="Promedio",
+                        yaxis_title="",
+                        height=470,
+                        margin=dict(l=20, r=30, t=20, b=20)
+                    )
+
+                    st.plotly_chart(fig_resumen, use_container_width=True)
+
+            with col_ia:
+                st.markdown("""
+                <div class="ai-box">
+                    <h4>🤖 Asistente IA</h4>
+                    <p>Consulta información de la encuesta, solicita reportes ejecutivos o pregunta por comentarios específicos.</p>
+                    <p><strong>Ejemplos:</strong></p>
+                    <p>• Dame el reporte de Psicología</p>
+                    <p>• ¿Qué dicen sobre baños?</p>
+                    <p>• ¿Cuáles son los focos rojos?</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+                pregunta_ia_resumen = st.text_input(
+                    "Pregunta al asistente",
+                    placeholder="Ej. Dame el reporte ejecutivo de Psicología"
                 )
 
-                fig_resumen = px.bar(
-                    df_seccion_resumen,
-                    x="PROMEDIO",
-                    y="SECCION",
-                    orientation="h",
-                    text="PROMEDIO",
-                    title="Promedio por sección"
-                )
+                if pregunta_ia_resumen:
+                    st.info("Aquí se conectará el asistente IA con KPIS y COMENTARIOS_ABIERTOS.")
 
-                fig_resumen.update_traces(texttemplate="%{text:.1f}", textposition="outside")
-                fig_resumen.update_layout(
-                    xaxis_range=[0, 100],
-                    xaxis_title="Promedio",
-                    yaxis_title="",
-                    height=560,
-                    margin=dict(l=30, r=30, t=60, b=30)
-                )
+        with tab_comparativo:
+            st.markdown("### Ranking comparativo por carrera")
 
-                st.plotly_chart(fig_resumen, use_container_width=True)
+            df_comp_base = df_filtrado.copy()
 
-            st.markdown("""
-            <div class="ai-box">
-                <h4>🤖 Asistente IA</h4>
-                <p>Consulta información de la encuesta, solicita reportes ejecutivos o pregunta por comentarios específicos.</p>
-            </div>
-            """, unsafe_allow_html=True)
+            if "SERVICIO_PROCEDENCIA" in df_comp_base.columns:
+                df_comp_base = df_comp_base[
+                    (df_comp_base["NIVEL_ANALISIS"] == "SECCION_CARRERA") &
+                    (df_comp_base["SERVICIO_PROCEDENCIA"] != "TODOS")
+                ]
 
-            pregunta_ia_resumen = st.text_input(
-                "Pregunta al asistente",
-                placeholder="Ej. Dame el reporte ejecutivo de Psicología"
-            )
+                if not df_comp_base.empty:
+                    df_ranking = (
+                        df_comp_base
+                        .groupby("SERVICIO_PROCEDENCIA", as_index=False)
+                        .agg(PROMEDIO=("PROMEDIO", "mean"))
+                        .sort_values("PROMEDIO", ascending=True)
+                    )
 
-            if pregunta_ia_resumen:
-                st.info("Aquí se conectará el asistente IA con KPIS y COMENTARIOS_ABIERTOS.")
+                    fig_rank = px.bar(
+                        df_ranking,
+                        x="PROMEDIO",
+                        y="SERVICIO_PROCEDENCIA",
+                        orientation="h",
+                        text="PROMEDIO",
+                        title="Promedio general por carrera / programa"
+                    )
+
+                    fig_rank.update_traces(texttemplate="%{text:.1f}", textposition="outside")
+                    fig_rank.update_layout(
+                        xaxis_range=[0, 100],
+                        xaxis_title="Promedio",
+                        yaxis_title="",
+                        height=max(520, len(df_ranking) * 26),
+                        margin=dict(l=20, r=30, t=50, b=20)
+                    )
+
+                    st.plotly_chart(fig_rank, use_container_width=True)
+
+                    st.dataframe(
+                        df_ranking.sort_values("PROMEDIO", ascending=False),
+                        use_container_width=True,
+                        hide_index=True
+                    )
+                else:
+                    st.info("No hay datos comparativos con los filtros seleccionados.")
+            else:
+                st.info("No se encontró la columna SERVICIO_PROCEDENCIA.")
 
         with tab_secciones:
             st.markdown("### Resultados por sección")
