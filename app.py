@@ -21,6 +21,22 @@ def conectar_google():
 
     return gspread.authorize(creds)
 
+import pandas as pd
+
+@st.cache_data(ttl=300)
+def cargar_kpis():
+    gc = conectar_google()
+
+    archivo = gc.open_by_key(
+        "1e-Zr56_EzGqNOdl1msgidEtpL_DZhJrzMKwwiyz6Bnk"
+    )
+
+    hoja = archivo.worksheet("KPIS")
+
+    datos = hoja.get_all_records()
+
+    return pd.DataFrame(datos)
+
 # ---------- ESTILOS ----------
 st.markdown("""
 <style>
