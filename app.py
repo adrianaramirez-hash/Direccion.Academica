@@ -445,6 +445,42 @@ elif menu == "📊 Encuesta de Calidad":
                 )
             else:
                 st.success("No se detectan focos rojos con los filtros seleccionados.")
+        st.markdown("### 🗣️ Comentarios abiertos")
+
+        if not df_comentarios.empty:
+            comentarios_vista = df_com_filtrado.copy()
+
+            palabra = st.text_input(
+                "Buscar en comentarios",
+                placeholder="Ej. baños, wifi, profesores, SEAC, biblioteca"
+            )
+
+            if palabra:
+                comentarios_vista = comentarios_vista[
+                    comentarios_vista["COMENTARIO"]
+                    .astype(str)
+                    .str.contains(palabra, case=False, na=False)
+                ]
+
+            columnas_comentarios = [
+                col for col in [
+                    "SERVICIO_PROCEDENCIA",
+                    "SECCION",
+                    "SUBSECCION",
+                    "PREGUNTA_LIMPIA",
+                    "COMENTARIO"
+                ] if col in comentarios_vista.columns
+            ]
+
+            st.caption(f"Comentarios encontrados: {len(comentarios_vista)}")
+
+            st.dataframe(
+                comentarios_vista[columnas_comentarios].head(100),
+                use_container_width=True,
+                hide_index=True
+            )
+        else:
+            st.info("No hay comentarios abiertos disponibles con los filtros seleccionados.")
 
         st.markdown("### Asistente IA de Encuesta")
 
