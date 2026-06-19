@@ -46,23 +46,18 @@ def cargar_comentarios():
 
 
 # ---------- UTILIDADES ----------
-def limpiar_texto(valor):
-    if pd.isna(valor):
-        return ""
-    return str(valor).strip()
-
-
 def formatear_promedio(valor):
     if pd.isna(valor):
         return "0.0"
     return f"{valor:.1f}"
 
 
-def render_card(valor, titulo):
+def render_card(valor, titulo, subtitulo=""):
     st.markdown(f"""
     <div class="metric-card">
         <h2>{valor}</h2>
         <p>{titulo}</p>
+        <span>{subtitulo}</span>
     </div>
     """, unsafe_allow_html=True)
 
@@ -74,10 +69,14 @@ def filtrar_dataframe(df, anio, modalidad, carrera):
         df_filtrado = df_filtrado[df_filtrado["ANIO_ESCOLAR"].astype(str) == anio]
 
     if "MODALIDAD" in df_filtrado.columns and modalidad != "Todas":
-        df_filtrado = df_filtrado[df_filtrado["MODALIDAD"].astype(str).str.upper() == modalidad.upper()]
+        df_filtrado = df_filtrado[
+            df_filtrado["MODALIDAD"].astype(str).str.upper() == modalidad.upper()
+        ]
 
     if "SERVICIO_PROCEDENCIA" in df_filtrado.columns and carrera != "Todas":
-        df_filtrado = df_filtrado[df_filtrado["SERVICIO_PROCEDENCIA"].astype(str) == carrera]
+        df_filtrado = df_filtrado[
+            df_filtrado["SERVICIO_PROCEDENCIA"].astype(str) == carrera
+        ]
 
     return df_filtrado
 
@@ -89,13 +88,20 @@ st.markdown("""
         background-color: #f7f9fc;
     }
 
+    .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        max-width: 1320px;
+    }
+
     .hero {
         background: white;
         padding: 2rem;
-        border-radius: 18px;
+        border-radius: 20px;
         border: 1px solid #e5e7eb;
         text-align: center;
         margin-bottom: 1.5rem;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.04);
     }
 
     .hero h1 {
@@ -110,34 +116,81 @@ st.markdown("""
         font-weight: 400;
     }
 
-    .metric-card {
-        background: white;
-        padding: 1.3rem;
-        border-radius: 16px;
+    .section-header {
+        background: #ffffff;
+        padding: 1.4rem 1.6rem;
+        border-radius: 18px;
         border: 1px solid #e5e7eb;
-        text-align: center;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        min-height: 120px;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.04);
+        margin-bottom: 1.2rem;
     }
 
-    .metric-card h2 {
+    .section-header h1 {
+        margin: 0;
         color: #1f2937;
-        margin-bottom: 0.1rem;
         font-size: 2.2rem;
     }
 
-    .metric-card p {
+    .section-header p {
+        margin-top: 0.4rem;
         color: #6b7280;
-        margin: 0;
         font-size: 1rem;
+    }
+
+    .metric-card {
+        background: white;
+        padding: 1.2rem;
+        border-radius: 18px;
+        border: 1px solid #e5e7eb;
+        text-align: center;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+        min-height: 115px;
+    }
+
+    .metric-card h2 {
+        color: #111827;
+        margin-bottom: 0.1rem;
+        font-size: 2.1rem;
+    }
+
+    .metric-card p {
+        color: #4b5563;
+        margin: 0;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .metric-card span {
+        color: #9ca3af;
+        font-size: 0.82rem;
     }
 
     .module-card {
         background: white;
         padding: 1.2rem;
-        border-radius: 14px;
+        border-radius: 16px;
         border: 1px solid #e5e7eb;
         margin-bottom: 0.8rem;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+    }
+
+    .portal-card {
+        background: #ffffff;
+        padding: 1.4rem;
+        border-radius: 18px;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 8px 18px rgba(0,0,0,0.05);
+        min-height: 155px;
+    }
+
+    .portal-card h4 {
+        margin-top: 0;
+        color: #0f172a;
+    }
+
+    .portal-card p {
+        color: #475569;
+        margin-bottom: 0.4rem;
     }
 
     .status-active {
@@ -148,6 +201,11 @@ st.markdown("""
     .status-soon {
         color: #92400e;
         font-weight: 700;
+    }
+
+    div[data-testid="stTabs"] button {
+        font-size: 0.95rem;
+        font-weight: 600;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -233,77 +291,54 @@ if menu == "🏠 Inicio":
 
 # ---------- ENCUESTA DE CALIDAD ----------
 elif menu == "📊 Encuesta de Calidad":
-    st.markdown("## 📊 Encuesta de Calidad")
-    st.caption("Análisis institucional de satisfacción, servicios, experiencia académica y comentarios abiertos.")
 
-    with st.expander("ℹ️ ¿Cómo se calculan los resultados?"):
-        st.markdown("""
-        ### Escala de evaluación
+    st.markdown("""
+    <div class="section-header">
+        <h1>📊 Encuesta de Calidad</h1>
+        <p>Análisis institucional de satisfacción, servicios, experiencia académica y comentarios abiertos.</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-        Las respuestas de la encuesta se convierten a una escala de **0 a 100** para facilitar la lectura institucional:
-
-        | Respuesta | Valor |
-        |---|---:|
-        | Excelente / Totalmente satisfecho / Muy satisfecho | 100 |
-        | Bueno / Satisfecho / De acuerdo | 80 |
-        | Regular / Neutral / Ni uno ni otro | 60 |
-        | Malo / Poco satisfecho / En desacuerdo | 40 |
-        | Muy malo / Nada satisfecho / Totalmente en desacuerdo | 20 |
-        | Sí | 100 |
-        | No | 0 |
-
-        Las respuestas **“No lo utilizo”** y **“No sé”** no se incluyen en el promedio.
-
-        ### Metas institucionales
-
-        | Sección | Meta |
-        |---|---:|
-        | Satisfacción general | 90 |
-        | Recomendación | 90 |
-        | Servicios | 85 |
-        | Académico | 85 |
-        | Dirección / Coordinación | 85 |
-        | Instalaciones | 80 |
-        | Ambiente escolar | 85 |
-        | Virtual: aprendizaje, SEAC, soporte y comunicación | 85 |
-
-        ### Semáforo de interpretación
-
-        | Rango | Estatus |
-        |---|---|
-        | 90 a 100 | 🟢 Sobresaliente |
-        | Igual o superior a la meta | 🔵 Adecuado |
-        | 70 a debajo de la meta | 🟡 Atención |
-        | Menor a 70 | 🔴 Foco rojo |
-
-        Los promedios se calculan a partir de las respuestas válidas registradas en **BASE_GENERAL** y resumidas en la hoja **KPIS**.
-        """)
     try:
         df_kpis = cargar_kpis()
         df_comentarios = cargar_comentarios()
-
-        st.success(f"✅ KPIS cargados: {len(df_kpis)} registros")
-
-        with st.expander("Ver muestra de KPIS"):
-            st.dataframe(df_kpis.head(10), use_container_width=True)
-
     except Exception as e:
         st.exception(e)
         df_kpis = pd.DataFrame()
         df_comentarios = pd.DataFrame()
 
-    st.markdown("---")
-
     if not df_kpis.empty:
-        # Normalización básica
-        for col in ["ANIO_ESCOLAR", "MODALIDAD", "SERVICIO_PROCEDENCIA", "NIVEL_ANALISIS", "SECCION", "ESTATUS", "SEMAFORO"]:
+        # Normalización KPIS
+        for col in [
+            "ANIO_ESCOLAR",
+            "MODALIDAD",
+            "SERVICIO_PROCEDENCIA",
+            "NIVEL_ANALISIS",
+            "SECCION",
+            "ESTATUS",
+            "SEMAFORO"
+        ]:
             if col in df_kpis.columns:
                 df_kpis[col] = df_kpis[col].astype(str).str.strip()
 
         if "PROMEDIO" in df_kpis.columns:
             df_kpis["PROMEDIO"] = pd.to_numeric(df_kpis["PROMEDIO"], errors="coerce")
 
-        # Filtros dinámicos
+        # Normalización comentarios
+        if not df_comentarios.empty:
+            for col in [
+                "ANIO_ESCOLAR",
+                "MODALIDAD",
+                "SERVICIO_PROCEDENCIA",
+                "SECCION",
+                "SUBSECCION",
+                "PREGUNTA_LIMPIA",
+                "COMENTARIO"
+            ]:
+                if col in df_comentarios.columns:
+                    df_comentarios[col] = df_comentarios[col].astype(str).str.strip()
+
+        # Filtros
         anios = ["Todas"] + sorted(df_kpis["ANIO_ESCOLAR"].dropna().astype(str).unique().tolist())
         modalidades = ["Todas"] + sorted([
             x for x in df_kpis["MODALIDAD"].dropna().astype(str).unique().tolist()
@@ -327,7 +362,6 @@ elif menu == "📊 Encuesta de Calidad":
 
         df_filtrado = filtrar_dataframe(df_kpis, anio, modalidad, carrera)
 
-        # Capa de resumen según el filtro
         if carrera != "Todas":
             df_resumen = df_filtrado[df_filtrado["NIVEL_ANALISIS"].isin(["SECCION_CARRERA"])]
             df_detalle = df_filtrado[df_filtrado["NIVEL_ANALISIS"].isin(["CARRERA"])]
@@ -345,11 +379,11 @@ elif menu == "📊 Encuesta de Calidad":
 
         total_kpis = len(df_filtrado)
 
+        focos_rojos = 0
         if "ESTATUS" in df_filtrado.columns:
             focos_rojos = len(df_filtrado[df_filtrado["ESTATUS"] == "FOCO_ROJO"])
-        else:
-            focos_rojos = 0
 
+        # Comentarios filtrados
         if not df_comentarios.empty:
             df_com_filtrado = df_comentarios.copy()
 
@@ -357,140 +391,263 @@ elif menu == "📊 Encuesta de Calidad":
                 df_com_filtrado = df_com_filtrado[df_com_filtrado["ANIO_ESCOLAR"].astype(str) == anio]
 
             if "MODALIDAD" in df_com_filtrado.columns and modalidad != "Todas":
-                df_com_filtrado = df_com_filtrado[df_com_filtrado["MODALIDAD"].astype(str).str.upper() == modalidad.upper()]
+                df_com_filtrado = df_com_filtrado[
+                    df_com_filtrado["MODALIDAD"].astype(str).str.upper() == modalidad.upper()
+                ]
 
             if "SERVICIO_PROCEDENCIA" in df_com_filtrado.columns and carrera != "Todas":
-                df_com_filtrado = df_com_filtrado[df_com_filtrado["SERVICIO_PROCEDENCIA"].astype(str) == carrera]
+                df_com_filtrado = df_com_filtrado[
+                    df_com_filtrado["SERVICIO_PROCEDENCIA"].astype(str) == carrera
+                ]
 
             total_comentarios = len(df_com_filtrado)
         else:
+            df_com_filtrado = pd.DataFrame()
             total_comentarios = 0
 
-        st.markdown("### Resumen ejecutivo")
-
+        # Tarjetas superiores
         k1, k2, k3, k4 = st.columns(4)
 
         with k1:
-            render_card(formatear_promedio(promedio_general), "Promedio general")
+            render_card(formatear_promedio(promedio_general), "Promedio general", "Escala 0 a 100")
 
         with k2:
-            render_card(formatear_promedio(recomendacion), "Recomendación")
+            render_card(formatear_promedio(recomendacion), "Recomendación", "Sección recomendación")
 
         with k3:
-            render_card(f"{total_kpis:,}", "Indicadores filtrados")
+            render_card(f"{focos_rojos:,}", "Focos rojos", "Indicadores críticos")
 
         with k4:
-            render_card(f"{focos_rojos:,}", "Focos rojos")
+            render_card(f"{total_comentarios:,}", "Comentarios", "Respuestas abiertas")
 
-        st.markdown("### Resultados por sección")
+        st.markdown("")
 
-        if not df_resumen.empty and "SECCION" in df_resumen.columns:
-            df_seccion = (
-                df_resumen
-                .groupby("SECCION", as_index=False)
-                .agg(
-                    PROMEDIO=("PROMEDIO", "mean"),
-                    RESPUESTAS_VALIDAS=("RESPUESTAS_VALIDAS", "sum")
+        # Paneles compactos tipo portal
+        p1, p2 = st.columns([1.25, 1])
+
+        with p1:
+            st.markdown("""
+            <div class="portal-card">
+                <h4>📌 Lectura ejecutiva inicial</h4>
+                <p>Este módulo concentra los resultados cuantitativos de la Encuesta de Calidad y permite revisar promedios por sección, carrera o modalidad.</p>
+                <p>Los focos rojos se calculan con base en metas institucionales y semáforos de desempeño.</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with p2:
+            st.markdown("""
+            <div class="portal-card">
+                <h4>ℹ️ Interpretación rápida</h4>
+                <p>🟢 Sobresaliente: 90 a 100</p>
+                <p>🔵 Adecuado: igual o superior a la meta</p>
+                <p>🟡 Atención: 70 a debajo de la meta</p>
+                <p>🔴 Foco rojo: menor a 70</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+        with st.expander("ℹ️ ¿Cómo se calculan los resultados?"):
+            st.markdown("""
+            ### Escala de evaluación
+
+            Las respuestas de la encuesta se convierten a una escala de **0 a 100**:
+
+            | Respuesta | Valor |
+            |---|---:|
+            | Excelente / Totalmente satisfecho / Muy satisfecho | 100 |
+            | Bueno / Satisfecho / De acuerdo | 80 |
+            | Regular / Neutral / Ni uno ni otro | 60 |
+            | Malo / Poco satisfecho / En desacuerdo | 40 |
+            | Muy malo / Nada satisfecho / Totalmente en desacuerdo | 20 |
+            | Sí | 100 |
+            | No | 0 |
+
+            Las respuestas **“No lo utilizo”** y **“No sé”** no se incluyen en el promedio.
+
+            ### Metas institucionales
+
+            | Sección | Meta |
+            |---|---:|
+            | Satisfacción general | 90 |
+            | Recomendación | 90 |
+            | Servicios | 85 |
+            | Académico | 85 |
+            | Dirección / Coordinación | 85 |
+            | Instalaciones | 80 |
+            | Ambiente escolar | 85 |
+            | Virtual: aprendizaje, SEAC, soporte y comunicación | 85 |
+            """)
+
+        # Pestañas internas
+        tab_resumen, tab_secciones, tab_focos, tab_comentarios, tab_ia = st.tabs([
+            "📌 Resumen",
+            "📊 Secciones",
+            "⚠️ Focos rojos",
+            "🗣️ Comentarios",
+            "🤖 Asistente IA"
+        ])
+
+        with tab_resumen:
+            st.markdown("### Vista general")
+
+            c1, c2 = st.columns([1.2, 1])
+
+            with c1:
+                if not df_resumen.empty and "SECCION" in df_resumen.columns:
+                    df_seccion_resumen = (
+                        df_resumen
+                        .groupby("SECCION", as_index=False)
+                        .agg(PROMEDIO=("PROMEDIO", "mean"))
+                        .sort_values("PROMEDIO", ascending=False)
+                    )
+
+                    fig_resumen = px.bar(
+                        df_seccion_resumen,
+                        x="SECCION",
+                        y="PROMEDIO",
+                        text="PROMEDIO",
+                        title="Promedio por sección"
+                    )
+                    fig_resumen.update_traces(texttemplate="%{text:.1f}", textposition="outside")
+                    fig_resumen.update_layout(
+                        yaxis_range=[0, 100],
+                        xaxis_title="",
+                        yaxis_title="Promedio",
+                        height=420
+                    )
+                    st.plotly_chart(fig_resumen, use_container_width=True)
+
+            with c2:
+                st.markdown("""
+                <div class="portal-card">
+                    <h4>Resumen del filtro seleccionado</h4>
+                    <p>Utiliza los filtros superiores para cambiar entre vista institucional, modalidad o carrera.</p>
+                    <p>Los resultados se actualizan automáticamente con base en la hoja KPIS.</p>
+                    <p>La sección de comentarios permite revisar evidencia cualitativa.</p>
+                </div>
+                """, unsafe_allow_html=True)
+
+        with tab_secciones:
+            st.markdown("### Resultados por sección")
+
+            if not df_resumen.empty and "SECCION" in df_resumen.columns:
+                df_seccion = (
+                    df_resumen
+                    .groupby("SECCION", as_index=False)
+                    .agg(
+                        PROMEDIO=("PROMEDIO", "mean"),
+                        RESPUESTAS_VALIDAS=("RESPUESTAS_VALIDAS", "sum")
+                    )
+                    .sort_values("PROMEDIO", ascending=False)
                 )
-                .sort_values("PROMEDIO", ascending=False)
-            )
 
-            fig = px.bar(
-                df_seccion,
-                x="SECCION",
-                y="PROMEDIO",
-                text="PROMEDIO",
-                title="Promedio por sección"
-            )
-            fig.update_traces(texttemplate="%{text:.1f}", textposition="outside")
-            fig.update_layout(yaxis_range=[0, 100], xaxis_title="", yaxis_title="Promedio")
-
-            st.plotly_chart(fig, use_container_width=True)
-
-            st.dataframe(
-                df_seccion,
-                use_container_width=True,
-                hide_index=True
-            )
-
-        st.markdown("### Focos rojos y áreas de atención")
-
-        if not df_detalle.empty:
-            df_alertas = df_detalle.copy()
-
-            if "PROMEDIO" in df_alertas.columns:
-                df_alertas = df_alertas.sort_values("PROMEDIO", ascending=True)
-
-            if "ESTATUS" in df_alertas.columns:
-                df_alertas = df_alertas[df_alertas["ESTATUS"].isin(["FOCO_ROJO", "ATENCION"])]
-
-            columnas_alertas = [
-                col for col in [
-                    "SERVICIO_PROCEDENCIA",
-                    "SECCION",
-                    "SUBSECCION",
-                    "PREGUNTA_LIMPIA",
-                    "PROMEDIO",
-                    "META",
-                    "ESTATUS",
-                    "SEMAFORO"
-                ] if col in df_alertas.columns
-            ]
-
-            if not df_alertas.empty:
                 st.dataframe(
-                    df_alertas[columnas_alertas].head(25),
+                    df_seccion,
                     use_container_width=True,
                     hide_index=True
                 )
             else:
-                st.success("No se detectan focos rojos con los filtros seleccionados.")
-        st.markdown("### 🗣️ Comentarios abiertos")
+                st.info("No hay datos de sección con los filtros seleccionados.")
 
-        if not df_comentarios.empty:
-            comentarios_vista = df_com_filtrado.copy()
+        with tab_focos:
+            st.markdown("### Focos rojos y áreas de atención")
 
-            palabra = st.text_input(
-                "Buscar en comentarios",
-                placeholder="Ej. baños, wifi, profesores, SEAC, biblioteca"
-            )
+            if not df_detalle.empty:
+                df_alertas = df_detalle.copy()
 
-            if palabra:
-                comentarios_vista = comentarios_vista[
-                    comentarios_vista["COMENTARIO"]
-                    .astype(str)
-                    .str.contains(palabra, case=False, na=False)
+                if "PROMEDIO" in df_alertas.columns:
+                    df_alertas = df_alertas.sort_values("PROMEDIO", ascending=True)
+
+                if "ESTATUS" in df_alertas.columns:
+                    df_alertas = df_alertas[df_alertas["ESTATUS"].isin(["FOCO_ROJO", "ATENCION"])]
+
+                columnas_alertas = [
+                    col for col in [
+                        "SERVICIO_PROCEDENCIA",
+                        "SECCION",
+                        "PREGUNTA_LIMPIA",
+                        "PROMEDIO",
+                        "META",
+                        "ESTATUS",
+                        "SEMAFORO"
+                    ] if col in df_alertas.columns
                 ]
 
-            columnas_comentarios = [
-                col for col in [
-                    "SERVICIO_PROCEDENCIA",
-                    "SECCION",
-                    "SUBSECCION",
-                    "PREGUNTA_LIMPIA",
-                    "COMENTARIO"
-                ] if col in comentarios_vista.columns
-            ]
+                if not df_alertas.empty:
+                    st.dataframe(
+                        df_alertas[columnas_alertas].head(30),
+                        use_container_width=True,
+                        hide_index=True
+                    )
+                else:
+                    st.success("No se detectan focos rojos con los filtros seleccionados.")
+            else:
+                st.info("No hay detalle disponible con los filtros seleccionados.")
 
-            st.caption(f"Comentarios encontrados: {len(comentarios_vista)}")
+        with tab_comentarios:
+            st.markdown("### Comentarios abiertos")
 
-            st.dataframe(
-                comentarios_vista[columnas_comentarios].head(100),
-                use_container_width=True,
-                hide_index=True
+            if not df_com_filtrado.empty:
+                colb1, colb2 = st.columns([1, 1])
+
+                with colb1:
+                    palabra = st.text_input(
+                        "Buscar en comentarios",
+                        placeholder="Ej. baños, wifi, profesores, SEAC, biblioteca"
+                    )
+
+                with colb2:
+                    secciones_com = ["Todas"] + sorted([
+                        x for x in df_com_filtrado["SECCION"].dropna().astype(str).unique().tolist()
+                        if x not in ["", "nan"]
+                    ]) if "SECCION" in df_com_filtrado.columns else ["Todas"]
+
+                    seccion_com = st.selectbox("Filtrar por sección", secciones_com)
+
+                comentarios_vista = df_com_filtrado.copy()
+
+                if seccion_com != "Todas" and "SECCION" in comentarios_vista.columns:
+                    comentarios_vista = comentarios_vista[
+                        comentarios_vista["SECCION"].astype(str) == seccion_com
+                    ]
+
+                if palabra and "COMENTARIO" in comentarios_vista.columns:
+                    comentarios_vista = comentarios_vista[
+                        comentarios_vista["COMENTARIO"]
+                        .astype(str)
+                        .str.contains(palabra, case=False, na=False)
+                    ]
+
+                columnas_comentarios = [
+                    col for col in [
+                        "SERVICIO_PROCEDENCIA",
+                        "SECCION",
+                        "PREGUNTA_LIMPIA",
+                        "COMENTARIO"
+                    ] if col in comentarios_vista.columns
+                ]
+
+                st.caption(f"Comentarios encontrados: {len(comentarios_vista)}")
+
+                st.dataframe(
+                    comentarios_vista[columnas_comentarios].head(100),
+                    use_container_width=True,
+                    hide_index=True
+                )
+            else:
+                st.info("No hay comentarios abiertos disponibles con los filtros seleccionados.")
+
+        with tab_ia:
+            st.markdown("### Asistente IA de Encuesta")
+
+            pregunta_ia = st.text_input(
+                "Pregunta al asistente sobre la encuesta",
+                placeholder="Ej. Dame el reporte ejecutivo de Psicología"
             )
-        else:
-            st.info("No hay comentarios abiertos disponibles con los filtros seleccionados.")
 
-        st.markdown("### Asistente IA de Encuesta")
-
-        pregunta_ia = st.text_input(
-            "Pregunta al asistente sobre la encuesta",
-            placeholder="Ej. Dame el reporte ejecutivo de Psicología"
-        )
-
-        if pregunta_ia:
-            st.info("Aquí se conectará el asistente IA para responder con base en KPIS y COMENTARIOS_ABIERTOS.")
+            if pregunta_ia:
+                st.info(
+                    "Aquí se conectará el asistente IA para responder con base en KPIS y COMENTARIOS_ABIERTOS."
+                )
 
     else:
         st.warning("No se pudieron cargar datos de KPIS.")
