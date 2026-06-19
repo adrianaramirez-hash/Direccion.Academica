@@ -4,7 +4,6 @@ import gspread
 import plotly.express as px
 from google.oauth2.service_account import Credentials
 
-# ---------- CONFIGURACIÓN ----------
 st.set_page_config(
     page_title="Dirección Académica | UDL",
     page_icon="🎓",
@@ -13,7 +12,7 @@ st.set_page_config(
 
 SHEET_ID = "1e-Zr56_EzGqNOdl1msgidEtpL_DZhJrzMKwwiyz6Bnk"
 
-# ---------- CONEXIÓN GOOGLE ----------
+
 def conectar_google():
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
@@ -45,7 +44,6 @@ def cargar_comentarios():
     return cargar_hoja("COMENTARIOS_ABIERTOS")
 
 
-# ---------- UTILIDADES ----------
 def formatear_promedio(valor):
     if pd.isna(valor):
         return "0.0"
@@ -81,7 +79,6 @@ def filtrar_dataframe(df, anio, modalidad, carrera):
     return df_filtrado
 
 
-# ---------- ESTILOS ----------
 st.markdown("""
 <style>
     .main {
@@ -118,51 +115,51 @@ st.markdown("""
 
     .section-header {
         background: #ffffff;
-        padding: 1.4rem 1.6rem;
+        padding: 1.2rem 1.5rem;
         border-radius: 18px;
         border: 1px solid #e5e7eb;
-        box-shadow: 0 8px 18px rgba(0,0,0,0.04);
-        margin-bottom: 1.2rem;
+        box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+        margin-bottom: 1.1rem;
     }
 
     .section-header h1 {
         margin: 0;
         color: #1f2937;
-        font-size: 2.2rem;
+        font-size: 2.1rem;
     }
 
     .section-header p {
-        margin-top: 0.4rem;
+        margin-top: 0.35rem;
         color: #6b7280;
         font-size: 1rem;
     }
 
     .metric-card {
         background: white;
-        padding: 1.2rem;
+        padding: 1rem;
         border-radius: 18px;
         border: 1px solid #e5e7eb;
         text-align: center;
         box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-        min-height: 115px;
+        min-height: 105px;
     }
 
     .metric-card h2 {
         color: #111827;
         margin-bottom: 0.1rem;
-        font-size: 2.1rem;
+        font-size: 1.9rem;
     }
 
     .metric-card p {
         color: #4b5563;
         margin: 0;
-        font-size: 0.95rem;
+        font-size: 0.92rem;
         font-weight: 600;
     }
 
     .metric-card span {
         color: #9ca3af;
-        font-size: 0.82rem;
+        font-size: 0.8rem;
     }
 
     .module-card {
@@ -174,23 +171,13 @@ st.markdown("""
         box-shadow: 0 6px 16px rgba(0,0,0,0.04);
     }
 
-    .portal-card {
+    .ai-box {
         background: #ffffff;
-        padding: 1.4rem;
+        padding: 1.2rem;
         border-radius: 18px;
         border: 1px solid #e5e7eb;
         box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-        min-height: 155px;
-    }
-
-    .portal-card h4 {
-        margin-top: 0;
-        color: #0f172a;
-    }
-
-    .portal-card p {
-        color: #475569;
-        margin-bottom: 0.4rem;
+        margin-top: 1rem;
     }
 
     .status-active {
@@ -211,7 +198,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 
-# ---------- SIDEBAR ----------
 with st.sidebar:
     st.image("udl_logo.png", use_container_width=True)
     st.markdown("### Dirección Académica")
@@ -235,7 +221,6 @@ with st.sidebar:
     )
 
 
-# ---------- INICIO ----------
 if menu == "🏠 Inicio":
     st.markdown("""
     <div class="hero">
@@ -289,13 +274,12 @@ if menu == "🏠 Inicio":
         """, unsafe_allow_html=True)
 
 
-# ---------- ENCUESTA DE CALIDAD ----------
 elif menu == "📊 Encuesta de Calidad":
 
     st.markdown("""
     <div class="section-header">
         <h1>📊 Encuesta de Calidad</h1>
-        <p>Análisis institucional de satisfacción, servicios, experiencia académica y comentarios abiertos.</p>
+        <p>Resultados cuantitativos y comentarios abiertos de la encuesta institucional.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -308,7 +292,6 @@ elif menu == "📊 Encuesta de Calidad":
         df_comentarios = pd.DataFrame()
 
     if not df_kpis.empty:
-        # Normalización KPIS
         for col in [
             "ANIO_ESCOLAR",
             "MODALIDAD",
@@ -324,7 +307,6 @@ elif menu == "📊 Encuesta de Calidad":
         if "PROMEDIO" in df_kpis.columns:
             df_kpis["PROMEDIO"] = pd.to_numeric(df_kpis["PROMEDIO"], errors="coerce")
 
-        # Normalización comentarios
         if not df_comentarios.empty:
             for col in [
                 "ANIO_ESCOLAR",
@@ -338,12 +320,13 @@ elif menu == "📊 Encuesta de Calidad":
                 if col in df_comentarios.columns:
                     df_comentarios[col] = df_comentarios[col].astype(str).str.strip()
 
-        # Filtros
         anios = ["Todas"] + sorted(df_kpis["ANIO_ESCOLAR"].dropna().astype(str).unique().tolist())
+
         modalidades = ["Todas"] + sorted([
             x for x in df_kpis["MODALIDAD"].dropna().astype(str).unique().tolist()
             if x not in ["TODOS", ""]
         ])
+
         carreras = ["Todas"] + sorted([
             x for x in df_kpis["SERVICIO_PROCEDENCIA"].dropna().astype(str).unique().tolist()
             if x not in ["TODOS", ""]
@@ -377,13 +360,10 @@ elif menu == "📊 Encuesta de Calidad":
         df_recomendacion = df_resumen[df_resumen["SECCION"] == "RECOMENDACION"]
         recomendacion = df_recomendacion["PROMEDIO"].mean() if not df_recomendacion.empty else 0
 
-        total_kpis = len(df_filtrado)
-
         focos_rojos = 0
         if "ESTATUS" in df_filtrado.columns:
             focos_rojos = len(df_filtrado[df_filtrado["ESTATUS"] == "FOCO_ROJO"])
 
-        # Comentarios filtrados
         if not df_comentarios.empty:
             df_com_filtrado = df_comentarios.copy()
 
@@ -405,14 +385,13 @@ elif menu == "📊 Encuesta de Calidad":
             df_com_filtrado = pd.DataFrame()
             total_comentarios = 0
 
-        # Tarjetas superiores
         k1, k2, k3, k4 = st.columns(4)
 
         with k1:
             render_card(formatear_promedio(promedio_general), "Promedio general", "Escala 0 a 100")
 
         with k2:
-            render_card(formatear_promedio(recomendacion), "Recomendación", "Sección recomendación")
+            render_card(formatear_promedio(recomendacion), "Recomendación", "Promedio de recomendación")
 
         with k3:
             render_card(f"{focos_rojos:,}", "Focos rojos", "Indicadores críticos")
@@ -420,36 +399,11 @@ elif menu == "📊 Encuesta de Calidad":
         with k4:
             render_card(f"{total_comentarios:,}", "Comentarios", "Respuestas abiertas")
 
-        st.markdown("")
-
-        # Paneles compactos tipo portal
-        p1, p2 = st.columns([1.25, 1])
-
-        with p1:
-            st.markdown("""
-            <div class="portal-card">
-                <h4>📌 Lectura ejecutiva inicial</h4>
-                <p>Este módulo concentra los resultados cuantitativos de la Encuesta de Calidad y permite revisar promedios por sección, carrera o modalidad.</p>
-                <p>Los focos rojos se calculan con base en metas institucionales y semáforos de desempeño.</p>
-            </div>
-            """, unsafe_allow_html=True)
-
-        with p2:
-            st.markdown("""
-            <div class="portal-card">
-                <h4>ℹ️ Interpretación rápida</h4>
-                <p>🟢 Sobresaliente: 90 a 100</p>
-                <p>🔵 Adecuado: igual o superior a la meta</p>
-                <p>🟡 Atención: 70 a debajo de la meta</p>
-                <p>🔴 Foco rojo: menor a 70</p>
-            </div>
-            """, unsafe_allow_html=True)
-
         with st.expander("ℹ️ ¿Cómo se calculan los resultados?"):
             st.markdown("""
             ### Escala de evaluación
 
-            Las respuestas de la encuesta se convierten a una escala de **0 a 100**:
+            Las respuestas se convierten a una escala de **0 a 100**.
 
             | Respuesta | Valor |
             |---|---:|
@@ -463,68 +417,68 @@ elif menu == "📊 Encuesta de Calidad":
 
             Las respuestas **“No lo utilizo”** y **“No sé”** no se incluyen en el promedio.
 
-            ### Metas institucionales
+            ### Semáforo
 
-            | Sección | Meta |
-            |---|---:|
-            | Satisfacción general | 90 |
-            | Recomendación | 90 |
-            | Servicios | 85 |
-            | Académico | 85 |
-            | Dirección / Coordinación | 85 |
-            | Instalaciones | 80 |
-            | Ambiente escolar | 85 |
-            | Virtual: aprendizaje, SEAC, soporte y comunicación | 85 |
+            | Rango | Estatus |
+            |---|---|
+            | 90 a 100 | 🟢 Sobresaliente |
+            | Igual o superior a la meta | 🔵 Adecuado |
+            | 70 a debajo de la meta | 🟡 Atención |
+            | Menor a 70 | 🔴 Foco rojo |
             """)
 
-        # Pestañas internas
-        tab_resumen, tab_secciones, tab_focos, tab_comentarios, tab_ia = st.tabs([
+        tab_resumen, tab_secciones, tab_focos, tab_comentarios = st.tabs([
             "📌 Resumen",
             "📊 Secciones",
             "⚠️ Focos rojos",
-            "🗣️ Comentarios",
-            "🤖 Asistente IA"
+            "🗣️ Comentarios"
         ])
 
         with tab_resumen:
             st.markdown("### Vista general")
 
-            c1, c2 = st.columns([1.2, 1])
+            if not df_resumen.empty and "SECCION" in df_resumen.columns:
+                df_seccion_resumen = (
+                    df_resumen
+                    .groupby("SECCION", as_index=False)
+                    .agg(PROMEDIO=("PROMEDIO", "mean"))
+                    .sort_values("PROMEDIO", ascending=True)
+                )
 
-            with c1:
-                if not df_resumen.empty and "SECCION" in df_resumen.columns:
-                    df_seccion_resumen = (
-                        df_resumen
-                        .groupby("SECCION", as_index=False)
-                        .agg(PROMEDIO=("PROMEDIO", "mean"))
-                        .sort_values("PROMEDIO", ascending=False)
-                    )
+                fig_resumen = px.bar(
+                    df_seccion_resumen,
+                    x="PROMEDIO",
+                    y="SECCION",
+                    orientation="h",
+                    text="PROMEDIO",
+                    title="Promedio por sección"
+                )
 
-                    fig_resumen = px.bar(
-                        df_seccion_resumen,
-                        x="SECCION",
-                        y="PROMEDIO",
-                        text="PROMEDIO",
-                        title="Promedio por sección"
-                    )
-                    fig_resumen.update_traces(texttemplate="%{text:.1f}", textposition="outside")
-                    fig_resumen.update_layout(
-                        yaxis_range=[0, 100],
-                        xaxis_title="",
-                        yaxis_title="Promedio",
-                        height=420
-                    )
-                    st.plotly_chart(fig_resumen, use_container_width=True)
+                fig_resumen.update_traces(texttemplate="%{text:.1f}", textposition="outside")
+                fig_resumen.update_layout(
+                    xaxis_range=[0, 100],
+                    xaxis_title="Promedio",
+                    yaxis_title="",
+                    height=560,
+                    margin=dict(l=30, r=30, t=60, b=30)
+                )
 
-            with c2:
-                st.markdown("""
-                <div class="portal-card">
-                    <h4>Resumen del filtro seleccionado</h4>
-                    <p>Utiliza los filtros superiores para cambiar entre vista institucional, modalidad o carrera.</p>
-                    <p>Los resultados se actualizan automáticamente con base en la hoja KPIS.</p>
-                    <p>La sección de comentarios permite revisar evidencia cualitativa.</p>
-                </div>
-                """, unsafe_allow_html=True)
+                st.plotly_chart(fig_resumen, use_container_width=True)
+
+            st.markdown("""
+            <div class="ai-box">
+                <h4>🤖 Asistente IA</h4>
+                <p>Consulta información de la encuesta, solicita reportes ejecutivos o pregunta por comentarios específicos.</p>
+            </div>
+            """, unsafe_allow_html=True)
+
+            pregunta_ia_resumen = st.text_input(
+                "Pregunta al asistente",
+                placeholder="Ej. Dame el reporte ejecutivo de Psicología"
+            )
+
+            if pregunta_ia_resumen:
+                st.info("Aquí se conectará el asistente IA con KPIS y COMENTARIOS_ABIERTOS.")
 
         with tab_secciones:
             st.markdown("### Resultados por sección")
@@ -596,10 +550,13 @@ elif menu == "📊 Encuesta de Calidad":
                     )
 
                 with colb2:
-                    secciones_com = ["Todas"] + sorted([
-                        x for x in df_com_filtrado["SECCION"].dropna().astype(str).unique().tolist()
-                        if x not in ["", "nan"]
-                    ]) if "SECCION" in df_com_filtrado.columns else ["Todas"]
+                    if "SECCION" in df_com_filtrado.columns:
+                        secciones_com = ["Todas"] + sorted([
+                            x for x in df_com_filtrado["SECCION"].dropna().astype(str).unique().tolist()
+                            if x not in ["", "nan"]
+                        ])
+                    else:
+                        secciones_com = ["Todas"]
 
                     seccion_com = st.selectbox("Filtrar por sección", secciones_com)
 
@@ -636,24 +593,10 @@ elif menu == "📊 Encuesta de Calidad":
             else:
                 st.info("No hay comentarios abiertos disponibles con los filtros seleccionados.")
 
-        with tab_ia:
-            st.markdown("### Asistente IA de Encuesta")
-
-            pregunta_ia = st.text_input(
-                "Pregunta al asistente sobre la encuesta",
-                placeholder="Ej. Dame el reporte ejecutivo de Psicología"
-            )
-
-            if pregunta_ia:
-                st.info(
-                    "Aquí se conectará el asistente IA para responder con base en KPIS y COMENTARIOS_ABIERTOS."
-                )
-
     else:
         st.warning("No se pudieron cargar datos de KPIS.")
 
 
-# ---------- PLACEHOLDERS ----------
 else:
     st.markdown(f"## {menu}")
     st.info("Este módulo se integrará en las siguientes fases del Ecosistema Digital.")
