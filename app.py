@@ -235,23 +235,49 @@ if menu == "🏠 Inicio":
 elif menu == "📊 Encuesta de Calidad":
     st.markdown("## 📊 Encuesta de Calidad")
     st.caption("Análisis institucional de satisfacción, servicios, experiencia académica y comentarios abiertos.")
-235  elif menu == "📊 Encuesta de Calidad":
 
-236      st.markdown("## 📊 Encuesta de Calidad")
+    with st.expander("ℹ️ ¿Cómo se calculan los resultados?"):
+        st.markdown("""
+        ### Escala de evaluación
 
-237      st.caption("Análisis institucional de satisfacción, servicios, experiencia académica y comentarios abiertos.")
+        Las respuestas de la encuesta se convierten a una escala de **0 a 100** para facilitar la lectura institucional:
 
-238
-239      with st.expander("ℹ️ ¿Cómo se calculan los resultados?"):
-240          st.markdown("""
-241          ...
-242          ...
-243          """)
-244
-245      try:
-246          df_kpis = cargar_kpis()
-247          df_comentarios = cargar_comentarios()
+        | Respuesta | Valor |
+        |---|---:|
+        | Excelente / Totalmente satisfecho / Muy satisfecho | 100 |
+        | Bueno / Satisfecho / De acuerdo | 80 |
+        | Regular / Neutral / Ni uno ni otro | 60 |
+        | Malo / Poco satisfecho / En desacuerdo | 40 |
+        | Muy malo / Nada satisfecho / Totalmente en desacuerdo | 20 |
+        | Sí | 100 |
+        | No | 0 |
 
+        Las respuestas **“No lo utilizo”** y **“No sé”** no se incluyen en el promedio.
+
+        ### Metas institucionales
+
+        | Sección | Meta |
+        |---|---:|
+        | Satisfacción general | 90 |
+        | Recomendación | 90 |
+        | Servicios | 85 |
+        | Académico | 85 |
+        | Dirección / Coordinación | 85 |
+        | Instalaciones | 80 |
+        | Ambiente escolar | 85 |
+        | Virtual: aprendizaje, SEAC, soporte y comunicación | 85 |
+
+        ### Semáforo de interpretación
+
+        | Rango | Estatus |
+        |---|---|
+        | 90 a 100 | 🟢 Sobresaliente |
+        | Igual o superior a la meta | 🔵 Adecuado |
+        | 70 a debajo de la meta | 🟡 Atención |
+        | Menor a 70 | 🔴 Foco rojo |
+
+        Los promedios se calculan a partir de las respuestas válidas registradas en **BASE_GENERAL** y resumidas en la hoja **KPIS**.
+        """)
     try:
         df_kpis = cargar_kpis()
         df_comentarios = cargar_comentarios()
