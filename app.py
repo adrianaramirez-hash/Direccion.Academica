@@ -235,6 +235,22 @@ if menu == "🏠 Inicio":
 elif menu == "📊 Encuesta de Calidad":
     st.markdown("## 📊 Encuesta de Calidad")
     st.caption("Análisis institucional de satisfacción, servicios, experiencia académica y comentarios abiertos.")
+235  elif menu == "📊 Encuesta de Calidad":
+
+236      st.markdown("## 📊 Encuesta de Calidad")
+
+237      st.caption("Análisis institucional de satisfacción, servicios, experiencia académica y comentarios abiertos.")
+
+238
+239      with st.expander("ℹ️ ¿Cómo se calculan los resultados?"):
+240          st.markdown("""
+241          ...
+242          ...
+243          """)
+244
+245      try:
+246          df_kpis = cargar_kpis()
+247          df_comentarios = cargar_comentarios()
 
     try:
         df_kpis = cargar_kpis()
