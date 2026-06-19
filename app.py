@@ -145,7 +145,7 @@ if menu == "🏠 Inicio":
         gc = conectar_google()
         st.success("✅ Conexión con Google Sheets exitosa")
     except Exception as e:
-        st.error(f"❌ Error de conexión con Google Sheets: {e}")
+        st.exception(e)
 
     col1, col2, col3, col4 = st.columns(4)
 
@@ -221,7 +221,7 @@ elif menu == "📊 Encuesta de Calidad":
             )
 
     except Exception as e:
-        st.error(f"❌ Error al leer KPIS: {e}")
+        st.exception(e)
         df_kpis = pd.DataFrame()
 
     st.markdown("---")
