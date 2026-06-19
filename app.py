@@ -1,13 +1,16 @@
 import streamlit as st
+import pandas as pd
 import gspread
 from google.oauth2.service_account import Credentials
 
+# ---------- CONFIGURACIÓN DE PÁGINA ----------
 st.set_page_config(
     page_title="Dirección Académica | UDL",
     page_icon="🎓",
     layout="wide"
 )
 
+# ---------- CONEXIÓN GOOGLE SHEETS ----------
 def conectar_google():
     scope = [
         "https://www.googleapis.com/auth/spreadsheets",
@@ -21,7 +24,6 @@ def conectar_google():
 
     return gspread.authorize(creds)
 
-import pandas as pd
 
 @st.cache_data(ttl=300)
 def cargar_kpis():
@@ -32,10 +34,10 @@ def cargar_kpis():
     )
 
     hoja = archivo.worksheet("KPIS")
-
     datos = hoja.get_all_records()
 
     return pd.DataFrame(datos)
+
 
 # ---------- ESTILOS ----------
 st.markdown("""
@@ -104,6 +106,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
+
 # ---------- SIDEBAR ----------
 with st.sidebar:
     st.image("udl_logo.png", use_container_width=True)
@@ -126,6 +129,7 @@ with st.sidebar:
             "🤖 Asistente IA"
         ]
     )
+
 
 # ---------- INICIO ----------
 if menu == "🏠 Inicio":
@@ -200,10 +204,25 @@ if menu == "🏠 Inicio":
         </div>
         """, unsafe_allow_html=True)
 
+
 # ---------- ENCUESTA DE CALIDAD ----------
 elif menu == "📊 Encuesta de Calidad":
     st.markdown("## 📊 Encuesta de Calidad")
     st.caption("Análisis institucional de satisfacción, servicios, experiencia académica y comentarios abiertos.")
+
+    try:
+        df_kpis = cargar_kpis()
+        st.success(f"✅ KPIS cargados: {len(df_kpis)} registros")
+
+        with st.expander("Ver muestra de KPIS"):
+            st.dataframe(
+                df_kpis.head(10),
+                use_container_width=True
+            )
+
+    except Exception as e:
+        st.error(f"❌ Error al leer KPIS: {e}")
+        df_kpis = pd.DataFrame()
 
     st.markdown("---")
 
@@ -216,7 +235,10 @@ elif menu == "📊 Encuesta de Calidad":
         modalidad = st.selectbox("Modalidad", ["Todas", "Escolarizada", "Preparatoria", "Virtual"])
 
     with colf3:
-        carrera = st.selectbox("Carrera / Programa", ["Todas", "Psicología", "Derecho", "Nutrición", "Tecnologías de la Información"])
+        carrera = st.selectbox(
+            "Carrera / Programa",
+            ["Todas", "Psicología", "Derecho", "Nutrición", "Tecnologías de la Información"]
+        )
 
     st.markdown("### Resumen ejecutivo")
 
@@ -300,6 +322,7 @@ elif menu == "📊 Encuesta de Calidad":
 
     if pregunta_ia:
         st.info("Aquí se conectará el asistente IA para responder con base en KPIS y COMENTARIOS_ABIERTOS.")
+
 
 # ---------- PLACEHOLDERS ----------
 else:
