@@ -220,9 +220,9 @@ elif menu == "📊 Encuesta de Calidad":
                 use_container_width=True
             )
 
-    except Exception as e:
-        st.error(f"❌ Error al leer KPIS: {e}")
-        df_kpis = pd.DataFrame()
+   except Exception as e:
+    st.error(f"❌ Error al leer KPIS: {e}")
+    df_kpis = pd.DataFrame()
 
     st.markdown("---")
 
