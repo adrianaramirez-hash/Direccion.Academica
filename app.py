@@ -1,10 +1,25 @@
 import streamlit as st
+import gspread
+from google.oauth2.service_account import Credentials
 
 st.set_page_config(
     page_title="Dirección Académica | UDL",
     page_icon="🎓",
     layout="wide"
 )
+
+def conectar_google():
+    scope = [
+        "https://www.googleapis.com/auth/spreadsheets",
+        "https://www.googleapis.com/auth/drive"
+    ]
+
+    creds = Credentials.from_service_account_info(
+        st.secrets["gcp_service_account_json"],
+        scopes=scope
+    )
+
+    return gspread.authorize(creds)
 
 # ---------- ESTILOS ----------
 st.markdown("""
@@ -105,6 +120,12 @@ if menu == "🏠 Inicio":
         <p>Universidad de Londres</p>
     </div>
     """, unsafe_allow_html=True)
+
+    try:
+        gc = conectar_google()
+        st.success("✅ Conexión con Google Sheets exitosa")
+    except Exception as e:
+        st.error(f"❌ Error de conexión con Google Sheets: {e}")
 
     col1, col2, col3, col4 = st.columns(4)
 
