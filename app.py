@@ -53,9 +53,9 @@ def formatear_promedio(valor):
 def render_card(valor, titulo, subtitulo=""):
     st.markdown(f"""
     <div class="metric-card">
-        <h2>{valor}</h2>
-        <p>{titulo}</p>
-        <span>{subtitulo}</span>
+        <div class="metric-value">{valor}</div>
+        <div class="metric-title">{titulo}</div>
+        <div class="metric-subtitle">{subtitulo}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -86,80 +86,97 @@ st.markdown("""
     }
 
     .block-container {
-        padding-top: 1.5rem;
+        padding-top: 1.3rem;
         padding-bottom: 2rem;
-        max-width: 1380px;
+        max-width: 1400px;
     }
 
     .hero {
-        background: white;
-        padding: 2rem;
-        border-radius: 20px;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        padding: 2.4rem;
+        border-radius: 22px;
         border: 1px solid #e5e7eb;
         text-align: center;
         margin-bottom: 1.5rem;
-        box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
     }
 
     .hero h1 {
-        font-size: 2.4rem;
-        margin-bottom: 0.2rem;
-        color: #1f2937;
+        font-size: 3rem;
+        margin-bottom: 0.25rem;
+        color: #111827;
+        font-weight: 800;
+        letter-spacing: -0.03em;
     }
 
     .hero h3 {
-        font-size: 1.1rem;
+        font-size: 1.25rem;
+        color: #4b5563;
+        font-weight: 500;
+        margin-bottom: 0.3rem;
+    }
+
+    .hero p {
         color: #6b7280;
-        font-weight: 400;
+        font-size: 1.05rem;
+        margin: 0;
     }
 
     .section-header {
-        background: #ffffff;
-        padding: 1rem 1.3rem;
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        padding: 1.1rem 1.4rem;
         border-radius: 18px;
         border: 1px solid #e5e7eb;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
         margin-bottom: 1rem;
     }
 
     .section-header h1 {
         margin: 0;
-        color: #1f2937;
-        font-size: 2rem;
+        color: #111827;
+        font-size: 2.15rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
     }
 
     .section-header p {
         margin-top: 0.25rem;
-        color: #6b7280;
-        font-size: 0.95rem;
+        color: #4b5563;
+        font-size: 1rem;
     }
 
     .metric-card {
-        background: white;
-        padding: 0.85rem;
+        background: #ffffff;
+        padding: 1rem 0.8rem;
         border-radius: 16px;
         border: 1px solid #e5e7eb;
         text-align: center;
-        box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-        min-height: 90px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
+        min-height: 92px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
-    .metric-card h2 {
+    .metric-value {
         color: #111827;
-        margin: 0;
-        font-size: 1.6rem;
+        font-size: 2rem;
+        font-weight: 800;
+        line-height: 1.1;
     }
 
-    .metric-card p {
-        color: #4b5563;
-        margin: 0.15rem 0 0 0;
-        font-size: 0.86rem;
-        font-weight: 600;
+    .metric-title {
+        color: #1f2937;
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-top: 0.25rem;
     }
 
-    .metric-card span {
-        color: #9ca3af;
-        font-size: 0.74rem;
+    .metric-subtitle {
+        color: #6b7280;
+        font-size: 0.78rem;
+        margin-top: 0.1rem;
+        font-weight: 500;
     }
 
     .module-card {
@@ -173,20 +190,21 @@ st.markdown("""
 
     .ai-box {
         background: #ffffff;
-        padding: 1rem;
+        padding: 1.1rem;
         border-radius: 18px;
         border: 1px solid #e5e7eb;
-        box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-        min-height: 340px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.07);
+        min-height: 360px;
     }
 
     .ai-box h4 {
         margin-top: 0;
         color: #111827;
+        font-size: 1.25rem;
     }
 
     .ai-box p {
-        color: #4b5563;
+        color: #374151;
         font-size: 0.92rem;
     }
 
@@ -202,7 +220,7 @@ st.markdown("""
 
     div[data-testid="stTabs"] button {
         font-size: 0.95rem;
-        font-weight: 600;
+        font-weight: 700;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -249,16 +267,16 @@ if menu == "🏠 Inicio":
     col1, col2, col3, col4 = st.columns(4)
 
     with col1:
-        render_card("31", "Programas académicos")
+        render_card("31", "Programas académicos", "Licenciaturas y posgrados")
 
     with col2:
-        render_card("400+", "Docentes")
+        render_card("400+", "Docentes", "Comunidad académica")
 
     with col3:
-        render_card("9", "Módulos proyectados")
+        render_card("9", "Módulos proyectados", "Ecosistema institucional")
 
     with col4:
-        render_card("1", "Módulo activo")
+        render_card("1", "Módulo activo", "Encuesta de Calidad")
 
     st.markdown("## Estado de módulos")
 
@@ -289,7 +307,7 @@ elif menu == "📊 Encuesta de Calidad":
     st.markdown("""
     <div class="section-header">
         <h1>📊 Encuesta de Calidad</h1>
-        <p>Resultados cuantitativos, comparativo por carrera y comentarios abiertos.</p>
+        <p>Resultados cuantitativos, comparativo por carrera, análisis por sección y comentarios abiertos.</p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -510,9 +528,24 @@ elif menu == "📊 Encuesta de Calidad":
                     (df_comp_base["SERVICIO_PROCEDENCIA"] != "TODOS")
                 ]
 
-                if not df_comp_base.empty:
+                secciones_disponibles = ["Todas"] + sorted([
+                    x for x in df_comp_base["SECCION"].dropna().astype(str).unique().tolist()
+                    if x not in ["", "nan"]
+                ])
+
+                seccion_ranking = st.selectbox(
+                    "Selecciona la sección a comparar",
+                    secciones_disponibles
+                )
+
+                df_comp_vista = df_comp_base.copy()
+
+                if seccion_ranking != "Todas":
+                    df_comp_vista = df_comp_vista[df_comp_vista["SECCION"] == seccion_ranking]
+
+                if not df_comp_vista.empty:
                     df_ranking = (
-                        df_comp_base
+                        df_comp_vista
                         .groupby("SERVICIO_PROCEDENCIA", as_index=False)
                         .agg(PROMEDIO=("PROMEDIO", "mean"))
                         .sort_values("PROMEDIO", ascending=True)
@@ -524,7 +557,7 @@ elif menu == "📊 Encuesta de Calidad":
                         y="SERVICIO_PROCEDENCIA",
                         orientation="h",
                         text="PROMEDIO",
-                        title="Promedio general por carrera / programa"
+                        title=f"Comparativo por carrera - {seccion_ranking}"
                     )
 
                     fig_rank.update_traces(texttemplate="%{text:.1f}", textposition="outside")
@@ -532,7 +565,7 @@ elif menu == "📊 Encuesta de Calidad":
                         xaxis_range=[0, 100],
                         xaxis_title="Promedio",
                         yaxis_title="",
-                        height=max(520, len(df_ranking) * 26),
+                        height=max(520, len(df_ranking) * 28),
                         margin=dict(l=20, r=30, t=50, b=20)
                     )
 
