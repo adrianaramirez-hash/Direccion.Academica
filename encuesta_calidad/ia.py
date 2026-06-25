@@ -29,16 +29,9 @@ SINONIMOS_TEMAS = {
         "mobiliario", "ventilación", "iluminación", "clima",
         "aire acondicionado"
     ],
-    "Biblioteca": [
-        "biblioteca", "libros", "préstamo", "acervo"
-    ],
-    "Cafetería": [
-        "cafetería", "cafeteria", "comida", "alimentos", "menú",
-        "precios"
-    ],
-    "Seguridad": [
-        "seguridad", "vigilancia", "guardia", "acceso", "entrada"
-    ],
+    "Biblioteca": ["biblioteca", "libros", "préstamo", "acervo"],
+    "Cafetería": ["cafetería", "cafeteria", "comida", "alimentos", "menú", "precios"],
+    "Seguridad": ["seguridad", "vigilancia", "guardia", "acceso", "entrada"],
     "Atención Administrativa": [
         "servicios escolares", "administrativo", "administración",
         "caja", "pagos", "becas", "admisiones", "cobranzas",
@@ -67,8 +60,6 @@ def normalizar_texto(texto):
 
 def detectar_tema(pregunta, df_analisis):
     pregunta_limpia = normalizar_texto(pregunta)
-
-    intencion = detectar_intencion(pregunta)
 
     for tema, sinonimos in SINONIMOS_TEMAS.items():
         for sinonimo in sinonimos:
@@ -128,6 +119,7 @@ def _tabla_hallazgos(contexto, limite=6):
 
 def generar_respuesta_simulada(pregunta, contexto):
     pregunta_limpia = normalizar_texto(pregunta)
+    intencion = detectar_intencion(pregunta)
 
     if contexto.empty:
         return """
@@ -207,7 +199,11 @@ Atender primero los hallazgos con prioridad **ALTA**, asignar responsable, fecha
 - Integrar resultados en seguimiento de Dirección Académica.
 """
 
-    if intencion in [Intencion.COMENTARIOS_TEMA, Intencion.RESUMEN_EJECUTIVO]:
+    if intencion in [
+        Intencion.COMENTARIOS_TEMA,
+        Intencion.RESUMEN_EJECUTIVO,
+        Intencion.RECOMENDACIONES
+    ]:
         titulo = f" sobre {tema_principal}" if tema_principal else ""
         return f"""
 ### 🗣️ Resumen de comentarios{titulo}
