@@ -153,7 +153,7 @@ Puedes intentar con otro tema, por ejemplo: **sanitarios**, **wifi**, **SEAC**, 
 
     hallazgos = _tabla_hallazgos(contexto)
 
-    if any(p in pregunta_limpia for p in ["fortaleza", "fortalezas", "mejor", "positivo"]):
+    if intencion == Intencion.FORTALEZAS:
         return f"""
 ### 📈 Fortalezas detectadas
 
@@ -168,7 +168,7 @@ Las fortalezas deben utilizarse como evidencia de buenas prácticas. Conviene re
 Documentar qué proceso, responsable o práctica explica estos resultados y convertirlo en estándar institucional.
 """
 
-    if any(p in pregunta_limpia for p in ["oportunidad", "oportunidades", "problema", "problemas", "riesgo", "riesgos", "foco", "focos"]):
+    if intencion == Intencion.AREAS_OPORTUNIDAD:
         return f"""
 ### ⚠️ Áreas de oportunidad
 
@@ -183,7 +183,7 @@ Las áreas de oportunidad deben priorizarse por frecuencia de comentarios, prior
 Atender primero los hallazgos con prioridad **ALTA**, asignar responsable, fecha de seguimiento y evidencia esperada.
 """
 
-    if any(p in pregunta_limpia for p in ["plan", "30", "60", "90", "accion", "acciones"]):
+    if intencion == Intencion.PLAN_ACCION:
         return f"""
 ### 📑 Plan de acción 30-60-90 días
 
@@ -207,7 +207,7 @@ Atender primero los hallazgos con prioridad **ALTA**, asignar responsable, fecha
 - Integrar resultados en seguimiento de Dirección Académica.
 """
 
-    if any(p in pregunta_limpia for p in ["comentario", "comentarios", "dicen", "opinan", "resumen", "resume", "hablan"]):
+    if intencion in [Intencion.COMENTARIOS_TEMA, Intencion.RESUMEN_EJECUTIVO]:
         titulo = f" sobre {tema_principal}" if tema_principal else ""
         return f"""
 ### 🗣️ Resumen de comentarios{titulo}
