@@ -1,6 +1,8 @@
 import re
 import pandas as pd
 
+from encuesta_calidad.intenciones import Intencion, detectar_intencion
+
 
 SINONIMOS_TEMAS = {
     "Sanitarios": [
@@ -65,6 +67,8 @@ def normalizar_texto(texto):
 
 def detectar_tema(pregunta, df_analisis):
     pregunta_limpia = normalizar_texto(pregunta)
+
+    intencion = detectar_intencion(pregunta)
 
     for tema, sinonimos in SINONIMOS_TEMAS.items():
         for sinonimo in sinonimos:
